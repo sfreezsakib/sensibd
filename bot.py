@@ -10,16 +10,17 @@ from github import Github
 
 # ============ CREDENTIALS ============
 TELEGRAM_TOKEN = "8429248919:AAF403QR9g7FPxNDeLdiIIBBROu25Fbfit8"
-GITHUB_TOKEN = "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"
+# আপনার দেওয়া নতুন টোকেন (Token #5)
+GITHUB_TOKEN = "Ghp_zT7kPcLPdsHwVuoP2NQAPW1p78Bg5v1ihD9N"
 REPO_NAME = "sfreezsakib/sensibd"
 # =====================================
 
-# --- FAKE WEB SERVER (Render ফ্রি চালানোর জন্য) ---
+# --- FAKE WEB SERVER ---
 app = Flask('')
 
 @app.route('/')
 def home():
-    return "Bot is running!"
+    return "Bot is running perfectly!"
 
 def run_http():
     app.run(host='0.0.0.0', port=8080)
@@ -27,14 +28,13 @@ def run_http():
 def keep_alive():
     t = Thread(target=run_http)
     t.start()
-# ---------------------------------------------
 
 # GitHub Connection
 try:
     g = Github(GITHUB_TOKEN)
     repo = g.get_repo(REPO_NAME)
 except Exception as e:
-    print(f"GitHub Error: {e}")
+    print(f"GitHub Connection Error: {e}")
 
 THUMBNAIL, TITLE_DEVICE, SECRET_IMG, LINKS = range(4)
 EDIT_SELECT, EDIT_VALUE = range(4, 6)
@@ -43,7 +43,7 @@ edit_cache = {}
 
 # --- UPLOAD COMMANDS ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("👋 **Sensi Admin Panel**\nReady!")
+    await update.message.reply_text("👋 **Sensi Admin Panel**\nReady to upload!")
 
 async def upload_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("1️⃣ **Thumbnail** ছবি পাঠান।")
@@ -51,35 +51,52 @@ async def upload_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def receive_thumbnail(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message.photo: return THUMBNAIL
-    photo = await update.message.photo[-1].get_file()
+    
+    # --- ERROR FIX: await সরায়ে ফেলা হয়েছে ---
+    photo_file = await update.message.photo[-1].get_file()
+    file_byte_array = await photo_file.download_as_bytearray()
+    
     fname = f"images/thumb_{int(time.time())}.jpg"
     
     try:
-        repo.create_file(fname, "Add thumb", await (await photo.download_as_bytearray()))
+        # bytes() এ কনভার্ট করে আপলোড করা হচ্ছে
+        repo.create_file(fname, "Add thumb", bytes(file_byte_array))
+        
         temp_data['thumb'] = f"https://raw.githubusercontent.com/{REPO_NAME.split('/')[0]}/{REPO_NAME.split('/')[1]}/main/{fname}"
-        await update.message.reply_text("✅ থাম্বনেইল সেভ।\n2️⃣ লিখুন: `Device | Title`")
+        await update.message.reply_text("✅ থাম্বনেইল সেভ।\n\n2️⃣ লিখুন: `Device | Title`")
         return TITLE_DEVICE
     except Exception as e:
-        await update.message.reply_text(f"Error: {e}")
+        await update.message.reply_text(f"❌ Error: {e}")
         return ConversationHandler.END
 
 async def receive_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if '|' not in update.message.text: return TITLE_DEVICE
+    if '|' not in update.message.text: 
+        await update.message.reply_text("❌ ভুল ফরম্যাট! `Device | Title` এভাবে লিখুন।")
+        return TITLE_DEVICE
+    
     dev, tit = update.message.text.split('|', 1)
     temp_data.update({'device': dev.strip(), 'title': tit.strip(), 'id': int(time.time())})
-    await update.message.reply_text("✅ টাইটেল সেভ।\n3️⃣ **Secret Image** পাঠান।")
+    await update.message.reply_text("✅ টাইটেল সেভ।\n\n3️⃣ **Secret Image** পাঠান।")
     return SECRET_IMG
 
 async def receive_secret(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message.photo: return SECRET_IMG
-    photo = await update.message.photo[-1].get_file()
+    
+    # --- ERROR FIX ---
+    photo_file = await update.message.photo[-1].get_file()
+    file_byte_array = await photo_file.download_as_bytearray()
+    
     fname = f"images/secret_{int(time.time())}.jpg"
+    
     try:
-        repo.create_file(fname, "Add secret", await (await photo.download_as_bytearray()))
+        repo.create_file(fname, "Add secret", bytes(file_byte_array))
+        
         temp_data['secret'] = f"https://raw.githubusercontent.com/{REPO_NAME.split('/')[0]}/{REPO_NAME.split('/')[1]}/main/{fname}"
-        await update.message.reply_text("✅ সিক্রেট সেভ।\n4️⃣ লিংক দিন: `Sensi Link, Panel Link`")
+        await update.message.reply_text("✅ সিক্রেট সেভ।\n\n4️⃣ লিংক দিন: `Sensi Link, Panel Link`")
         return LINKS
-    except: return ConversationHandler.END
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+        return ConversationHandler.END
 
 async def receive_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
@@ -90,7 +107,7 @@ async def receive_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data.insert(0, temp_data.copy())
     save_json(data)
     
-    await update.message.reply_text("🎉 **পোস্ট পাবলিশ হয়েছে!**")
+    await update.message.reply_text("🎉 **পোস্ট সাকসেসফুল!**")
     temp_data.clear()
     return ConversationHandler.END
 
