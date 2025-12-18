@@ -2,250 +2,197 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SensiBD Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <script type="text/javascript" src="https://pl27973568.effectivegatecpm.com/a3/7a/5b/a37a5b77fe911c2ad4f807bceac08e82.js"></script>
-    <script type="text/javascript" src="https://pl27973575.effectivegatecpm.com/85/91/3c/85913c8d9ebf0d128a8114e95032ce40.js"></script>
 
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; }
-        .glass { background: rgba(30,41,59,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-        .blur-secret { filter: blur(20px); pointer-events: none; user-select: none; }
-        .modal { opacity: 0; pointer-events: none; transition: 0.3s; transform: scale(0.95); }
-        .modal.active { opacity: 1; pointer-events: auto; transform: scale(1); }
-        .task-btn.done { background: #22c55e; border-color: #22c55e; color: white; pointer-events: none; }
+        .glass { background: rgba(30,41,59,0.9); border: 1px solid rgba(255,255,255,0.1); }
+        .page-enter { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .hidden { display: none !important; }
+        .tab-active { background-color: #4f46e5; color: white; }
+        .tab-inactive { background-color: #1f2937; color: #9ca3af; }
     </style>
 </head>
-<body class="pb-24 min-h-screen">
+<body class="min-h-screen">
     
-    <nav class="fixed top-0 w-full z-40 glass px-4 py-3 flex justify-between shadow-xl items-center">
-        <h1 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 tracking-wider">SENSIBD</h1>
-        <div class="flex gap-3">
-            <button onclick="document.getElementById('upModal').classList.add('active')" class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg hover:scale-105 transition">
-                <i class="fas fa-cloud-upload-alt text-white"></i>
-            </button>
-            <div class="relative">
-                <input id="search" placeholder="Search..." class="bg-slate-800/80 rounded-full pl-3 py-1.5 text-sm w-28 focus:w-40 transition-all border border-slate-600 outline-none">
-                <i class="fas fa-search absolute right-3 top-2.5 text-gray-400 text-xs"></i>
-            </div>
-        </div>
-    </nav>
+    <div id="home-page">
+        <nav class="fixed top-0 w-full z-40 glass px-4 py-3 flex justify-between shadow-xl items-center">
+            <h1 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-green-400">SENSIBD</h1>
+            <button onclick="openModal()" class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg hover:scale-110 transition"><i class="fas fa-cloud-upload-alt text-white"></i></button>
+        </nav>
 
-    <main id="app" class="pt-24 px-4 max-w-xl mx-auto space-y-6">
-        <div class="text-center mt-10">
-            <i class="fas fa-spinner fa-spin text-indigo-500 text-2xl"></i>
-            <p class="text-gray-500 text-xs mt-2">Loading Configs...</p>
-        </div>
-    </main>
+        <main id="app" class="pt-24 px-4 pb-10 max-w-xl mx-auto grid grid-cols-2 gap-4">
+            <div class="col-span-2 text-center mt-10"><i class="fas fa-spinner fa-spin text-indigo-500 text-2xl"></i></div>
+        </main>
+    </div>
 
-    <div id="taskModal" class="modal fixed inset-0 z-[60] flex items-center justify-center bg-black/95 p-5 backdrop-blur-sm">
-        <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl">
-            <h2 class="text-xl font-bold mb-1 text-white">Unlock Content</h2>
-            <p class="text-xs text-gray-400 mb-4">Complete tasks to see the download link</p>
+    <div id="post-page" class="fixed inset-0 z-50 bg-gray-900 overflow-y-auto hidden">
+        <div class="sticky top-0 bg-gray-900/95 backdrop-blur-md p-4 flex items-center gap-4 border-b border-gray-800 z-50">
+            <button onclick="closePost()" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700"><i class="fas fa-arrow-left"></i></button>
+            <h2 id="p-nav-title" class="font-bold text-lg truncate text-gray-200">Details</h2>
+        </div>
+
+        <div class="p-5 max-w-xl mx-auto space-y-6">
+            <img id="p-thumb" class="w-full rounded-xl shadow-2xl border border-gray-700">
             
-            <div class="space-y-3">
-                <a href="https://www.youtube.com/@issakibbd" target="_blank" onclick="chk(this)" class="task-btn block w-full py-3 rounded-lg border border-red-900/50 bg-red-900/10 text-red-500 font-bold hover:bg-red-900/20 transition flex items-center justify-center gap-2">
-                    <i class="fab fa-youtube"></i> Subscribe
+            <div>
+                <span id="p-device" class="bg-indigo-600 text-xs font-bold px-3 py-1 rounded-full uppercase">DEVICE</span>
+                <h1 id="p-title" class="text-2xl font-bold mt-3 leading-tight">Title Here</h1>
+            </div>
+
+            <div class="relative bg-black rounded-xl border border-gray-700 overflow-hidden min-h-[250px]">
+                <div id="lock-overlay" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900/98 transition-opacity duration-500">
+                    <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4 border border-gray-600">
+                        <i class="fas fa-lock text-yellow-500 text-2xl animate-pulse"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-1 text-white">Premium Sensi</h3>
+                    <p class="text-gray-400 text-xs mb-5">Unlock to reveal secret settings</p>
+                    <button onclick="startTimer()" id="unlock-btn" class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition text-sm">Unlock Now (30s)</button>
+                    <div id="timer-display" class="hidden text-5xl font-mono font-bold text-yellow-400 animate-bounce">30</div>
+                </div>
+                <img id="p-secret" class="w-full h-full object-contain">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-4">
+                <a id="lnk-sensi" href="#" target="_blank" class="bg-gray-800 py-4 rounded-xl text-center font-bold border border-gray-700 hover:border-indigo-500 hover:bg-gray-700 transition text-blue-400">
+                    <i class="fas fa-file-download text-xl block mb-2"></i> Sensi
                 </a>
-                <a href="https://www.facebook.com/issakib4" target="_blank" onclick="chk(this)" class="task-btn block w-full py-3 rounded-lg border border-blue-900/50 bg-blue-900/10 text-blue-500 font-bold hover:bg-blue-900/20 transition flex items-center justify-center gap-2">
-                    <i class="fab fa-facebook"></i> Follow FB
-                </a>
-                <a href="https://t.me/issakib" target="_blank" onclick="chk(this)" class="task-btn block w-full py-3 rounded-lg border border-sky-900/50 bg-sky-900/10 text-sky-500 font-bold hover:bg-sky-900/20 transition flex items-center justify-center gap-2">
-                    <i class="fab fa-telegram"></i> Join TG
+                <a id="lnk-panel" href="#" target="_blank" class="bg-gray-800 py-4 rounded-xl text-center font-bold border border-gray-700 hover:border-purple-500 hover:bg-gray-700 transition text-purple-400">
+                    <i class="fas fa-code text-xl block mb-2"></i> Panel
                 </a>
             </div>
-            <p id="t-stat" class="mt-4 text-[10px] text-gray-500">Checking...</p>
         </div>
     </div>
 
-    <div id="upModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+    <div id="upModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4 hidden">
         <div class="bg-gray-800 rounded-xl w-full max-w-sm border border-gray-700 overflow-hidden shadow-2xl">
-            <div class="flex border-b border-gray-700">
-                <button onclick="swTab('up')" id="btn-up" class="flex-1 py-3 text-sm font-bold bg-indigo-600 text-white">Upload</button>
-                <button onclick="swTab('req')" id="btn-req" class="flex-1 py-3 text-sm font-bold bg-gray-800 text-gray-400">Request</button>
+            <div class="flex text-sm font-bold border-b border-gray-700">
+                <button onclick="switchTab('up')" id="tab-up" class="flex-1 py-3 tab-active">Upload</button>
+                <button onclick="switchTab('req')" id="tab-req" class="flex-1 py-3 tab-inactive">Request</button>
             </div>
             
             <div class="p-5">
-                <div id="f-up" class="space-y-4">
-                    <input id="u-dev" placeholder="Device Name (e.g. Vivo Y20)" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-700 outline-none focus:border-indigo-500">
-                    <input type="file" id="u-file" class="w-full text-xs text-gray-400 file:bg-gray-700 file:text-white file:border-none file:px-3 file:py-1 file:rounded-lg">
-                    <button onclick="sendUp()" class="w-full bg-indigo-600 py-2.5 rounded-lg font-bold text-sm hover:bg-indigo-500 transition">Send to Admin</button>
+                <div id="form-up" class="space-y-4">
+                    <input id="u-dev" type="text" placeholder="Device Name" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 text-white outline-none">
+                    <input id="u-file" type="file" class="w-full text-xs text-gray-400">
+                    <button onclick="sendUpload()" id="btn-up-send" class="w-full bg-indigo-600 py-2.5 rounded-lg font-bold text-sm hover:bg-indigo-500">Send Upload</button>
                 </div>
 
-                <div id="f-req" class="hidden space-y-4">
-                    <input id="r-dev" placeholder="Device Name" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-700 outline-none focus:border-purple-500">
-                    <textarea id="r-rsn" placeholder="Why do you need it?" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-700 outline-none focus:border-purple-500"></textarea>
-                    <button onclick="sendReq()" class="w-full bg-purple-600 py-2.5 rounded-lg font-bold text-sm hover:bg-purple-500 transition">Request Config</button>
+                <div id="form-req" class="space-y-4 hidden">
+                    <input id="r-dev" type="text" placeholder="Device Name" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 text-white outline-none">
+                    <textarea id="r-msg" placeholder="Details..." class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 text-white outline-none"></textarea>
+                    <button onclick="sendRequest()" id="btn-req-send" class="w-full bg-purple-600 py-2.5 rounded-lg font-bold text-sm hover:bg-purple-500">Send Request</button>
                 </div>
-                
-                <button onclick="document.getElementById('upModal').classList.remove('active')" class="w-full mt-4 text-xs text-red-400 hover:text-white">Close</button>
+                <button onclick="document.getElementById('upModal').classList.add('hidden')" class="w-full mt-4 text-xs text-red-400 hover:text-white">Close</button>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-800 px-4 py-2 rounded-full shadow-lg border border-gray-600 text-xs font-bold flex items-center gap-2 hidden z-[70]">
-        <i class="fas fa-check-circle text-green-500"></i> <span id="t-msg">Done</span>
-    </div>
-
     <script>
-        // ============ CONFIGURATION ============
         const CFG = { 
-            // ✅ আপনার JSONBin লিংক বসানো হয়েছে
+            // ✅ আপনার নতুন ডাটাবেস লিংক
             binUrl: "https://api.jsonbin.io/v3/b/69440783d0ea881f40323ec1/latest",
             bot: "8035929255:AAFtYUflLVLPdBhzDn6vVjsxIkAALhqZtA4", 
             chat: "6963247195" 
         };
-        // =======================================
 
-        let curId = null, done = 0;
+        let allPosts = [];
 
         async function load() {
             try {
-                // ✅ JSONBin থেকে ডাটা লোড হবে
                 const r = await fetch(CFG.binUrl);
                 const d = await r.json();
-                const posts = d.record; // JSONBin ডাটা 'record' এর ভেতর রাখে
+                allPosts = d.record;
 
-                if(!posts || posts.length === 0) {
-                    document.getElementById('app').innerHTML = '<p class="text-center text-gray-500">No posts yet.</p>';
+                const app = document.getElementById('app');
+                if(!allPosts || allPosts.length === 0) {
+                    app.innerHTML = '<p class="col-span-2 text-center text-gray-500 mt-10">No configs found.</p>';
                     return;
                 }
 
-                document.getElementById('app').innerHTML = posts.map(p => `
-                    <div class="glass rounded-xl overflow-hidden shadow-xl animate-fade-in group">
-                        <div class="relative h-52">
-                            <img src="${p.thumb}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent"></div>
-                            <div class="absolute bottom-3 left-3">
-                                <h2 class="font-bold text-lg leading-none">${p.title}</h2>
-                                <span class="text-[10px] bg-indigo-600 px-2 py-0.5 rounded mt-1 inline-block uppercase font-bold">${p.device}</span>
-                            </div>
+                app.innerHTML = allPosts.map((p, index) => `
+                    <div onclick="openPost(${index})" class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 active:scale-95 transition cursor-pointer group">
+                        <div class="h-40 w-full relative overflow-hidden">
+                            <img src="${p.thumb}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent opacity-60"></div>
                         </div>
-                        <div class="p-4">
-                            <div class="relative bg-slate-900/50 rounded-lg p-2 min-h-[160px] border border-slate-700/50 mb-4 overflow-hidden">
-                                <div id="l-${p.id}" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-sm transition-all duration-500">
-                                    <div class="bg-gray-800 p-2 rounded-full mb-2 border border-gray-700"><i class="fas fa-lock text-yellow-500"></i></div>
-                                    <p class="text-[10px] text-gray-400 mb-3">Premium Config</p>
-                                    <button onclick="timer(${p.id})" class="bg-indigo-600 px-5 py-1.5 rounded-full text-xs font-bold shadow-lg hover:scale-105 transition">Unlock (30s)</button>
-                                </div>
-                                <img src="${p.secret}" id="s-${p.id}" class="w-full h-full object-contain blur-secret">
-                            </div>
-                            <div id="b-${p.id}" class="flex gap-2 opacity-40 pointer-events-none transition-all">
-                                <a href="${p.sensi_link}" target="_blank" class="flex-1 bg-gray-800 border border-gray-700 hover:bg-gray-700 py-2.5 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-download text-indigo-400"></i> Sensi</a>
-                                <a href="${p.panel_link}" target="_blank" class="flex-1 bg-gray-800 border border-gray-700 hover:bg-gray-700 py-2.5 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-code text-purple-400"></i> Panel</a>
-                            </div>
+                        <div class="p-3">
+                            <h3 class="font-bold text-sm truncate">${p.title}</h3>
+                            <p class="text-[10px] text-gray-400 mt-1 uppercase bg-gray-900 inline-block px-2 rounded">${p.device}</p>
                         </div>
-                    </div>`).join('');
-            } catch (e) { document.getElementById('app').innerHTML = '<p class="text-center text-red-400">Server Error</p>'; }
+                    </div>
+                `).join('');
+            } catch (e) { console.log(e); }
         }
 
-        window.timer = (id) => {
-            const el = document.getElementById(`l-${id}`);
-            el.querySelector('button').style.display='none';
+        window.openPost = (index) => {
+            const p = allPosts[index];
+            document.getElementById('p-nav-title').innerText = p.device;
+            document.getElementById('p-title').innerText = p.title;
+            document.getElementById('p-device').innerText = p.device;
+            document.getElementById('p-thumb').src = p.thumb;
+            document.getElementById('p-secret').src = p.secret;
+            document.getElementById('lnk-sensi').href = p.sensi_link;
+            document.getElementById('lnk-panel').href = p.panel_link;
+
+            document.getElementById('lock-overlay').style.display = 'flex';
+            document.getElementById('post-page').classList.remove('hidden');
+            document.getElementById('post-page').classList.add('page-enter');
+        }
+
+        window.closePost = () => document.getElementById('post-page').classList.add('hidden');
+        window.openModal = () => document.getElementById('upModal').classList.remove('hidden');
+
+        window.startTimer = () => {
+            const btn = document.getElementById('unlock-btn');
+            const disp = document.getElementById('timer-display');
+            btn.style.display = 'none';
+            disp.classList.remove('hidden');
             let t = 30;
-            const sp = document.createElement('div');
-            sp.innerHTML = `<span class="text-3xl font-mono text-yellow-400 font-bold">${t}</span>`;
-            el.appendChild(sp);
-            
-            const i = setInterval(() => {
-                t--; sp.querySelector('span').innerText = t;
-                if(t<0) { clearInterval(i); curId=id; document.getElementById('taskModal').classList.add('active'); }
+            disp.innerText = t;
+            const intv = setInterval(() => {
+                t--; disp.innerText = t;
+                if(t <= 0) { clearInterval(intv); document.getElementById('lock-overlay').style.display = 'none'; }
             }, 1000);
         }
 
-        window.chk = (b) => {
-            if(b.classList.contains('done')) return;
-            setTimeout(() => {
-                b.classList.add('done'); b.innerHTML = '<i class="fas fa-check"></i> Done'; done++;
-                if(done===3) {
-                    document.getElementById('t-stat').innerText = "✅ Unlocking...";
-                    document.getElementById('t-stat').className = "mt-4 text-[10px] text-green-400 font-bold";
-                    setTimeout(() => {
-                        document.getElementById('taskModal').classList.remove('active');
-                        fullyUnlock(curId);
-                        done=0; document.querySelectorAll('.task-btn').forEach(x=>{ x.classList.remove('done'); x.style=""; });
-                        reloadTaskText();
-                    }, 1500);
-                }
-            }, 2000);
+        window.switchTab = (tab) => {
+            document.getElementById('form-up').classList.toggle('hidden', tab !== 'up');
+            document.getElementById('form-req').classList.toggle('hidden', tab !== 'req');
+            document.getElementById('tab-up').className = tab === 'up' ? "flex-1 py-3 tab-active" : "flex-1 py-3 tab-inactive";
+            document.getElementById('tab-req').className = tab === 'req' ? "flex-1 py-3 tab-active" : "flex-1 py-3 tab-inactive";
         }
 
-        function reloadTaskText() {
-            const b = document.querySelectorAll('.task-btn');
-            b[0].innerHTML = '<i class="fab fa-youtube"></i> Subscribe';
-            b[1].innerHTML = '<i class="fab fa-facebook"></i> Follow FB';
-            b[2].innerHTML = '<i class="fab fa-telegram"></i> Join TG';
+        async function sendUpload() {
+            const dev = document.getElementById('u-dev').value;
+            const file = document.getElementById('u-file').files[0];
+            const btn = document.getElementById('btn-up-send');
+            if(!dev || !file) return alert("❌ নাম এবং ফাইল দিন!");
+            
+            btn.innerText = "Sending...";
+            const fd = new FormData(); fd.append("chat_id", CFG.chat); fd.append("photo", file); fd.append("caption", `📤 Upload: ${dev}`);
+            try { await fetch(`https://api.telegram.org/bot${CFG.bot}/sendPhoto`, {method:'POST', body:fd}); alert("✅ Sent!"); document.getElementById('upModal').classList.add('hidden'); }
+            catch { alert("❌ Error!"); }
+            btn.innerText = "Send Upload";
         }
 
-        function fullyUnlock(id) {
-            const l = document.getElementById(`l-${id}`);
-            l.style.opacity = '0';
-            setTimeout(() => l.style.display='none', 500);
-            document.getElementById(`s-${id}`).classList.remove('blur-secret');
-            document.getElementById(`b-${id}`).classList.remove('opacity-40', 'pointer-events-none');
-            toast("File Unlocked!");
+        async function sendRequest() {
+            const dev = document.getElementById('r-dev').value;
+            const msg = document.getElementById('r-msg').value;
+            const btn = document.getElementById('btn-req-send');
+            if(!dev) return alert("❌ নাম দিন!");
+            
+            btn.innerText = "Sending...";
+            try { await fetch(`https://api.telegram.org/bot${CFG.bot}/sendMessage`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chat_id: CFG.chat, text:`📥 Request: ${dev}\n💬 ${msg}`})}); alert("✅ Sent!"); document.getElementById('upModal').classList.add('hidden'); }
+            catch { alert("❌ Error!"); }
+            btn.innerText = "Send Request";
         }
-
-        window.swTab = (t) => {
-            document.getElementById('f-up').classList.toggle('hidden', t!=='up');
-            document.getElementById('f-req').classList.toggle('hidden', t!=='req');
-            document.getElementById('btn-up').className = t==='up' ? "flex-1 py-3 text-sm font-bold bg-indigo-600 text-white" : "flex-1 py-3 text-sm font-bold bg-gray-800 text-gray-400";
-            document.getElementById('btn-req').className = t==='req' ? "flex-1 py-3 text-sm font-bold bg-purple-600 text-white" : "flex-1 py-3 text-sm font-bold bg-gray-800 text-gray-400";
-        }
-
-        async function sendUp() {
-            const d = document.getElementById('u-dev').value, f = document.getElementById('u-file').files[0];
-            if(!d || !f) return toast("⚠️ Fill all fields");
-            toast("📤 Sending...");
-            const fd = new FormData(); fd.append("chat_id", CFG.chat); fd.append("photo", f); fd.append("caption", `📤 **Upload**\n📱 ${d}`);
-            try { await fetch(`https://api.telegram.org/bot${CFG.bot}/sendPhoto`, {method:'POST', body:fd}); toast("✅ Sent!"); document.getElementById('upModal').classList.remove('active'); }
-            catch { toast("❌ Failed"); }
-        }
-
-        async function sendReq() {
-            const d = document.getElementById('r-dev').value, r = document.getElementById('r-rsn').value;
-            if(!d) return toast("⚠️ Fill Device Name");
-            toast("📩 Sending...");
-            try { await fetch(`https://api.telegram.org/bot${CFG.bot}/sendMessage`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chat_id: CFG.chat, text:`📥 **Request**\n📱 ${d}\n❓ ${r}`})}); toast("✅ Request Sent!"); document.getElementById('upModal').classList.remove('active'); }
-            catch { toast("❌ Failed"); }
-        }
-
-        function toast(m) {
-            const t = document.getElementById('toast');
-            document.getElementById('t-msg').innerText = m;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
-        }
-
-        document.getElementById('search').addEventListener('input', async (e) => {
-            const v = e.target.value.toLowerCase();
-            if(v === "") return load();
-            const r = await fetch(CFG.binUrl);
-            const d = await r.json();
-            const f = d.record.filter(x => x.device.toLowerCase().includes(v));
-            // Simple render for search
-            if(f.length) {
-                document.getElementById('app').innerHTML = f.map(p => `
-                    <div class="glass rounded-xl overflow-hidden shadow-xl animate-fade-in group">
-                        <div class="relative h-52">
-                            <img src="${p.thumb}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent"></div>
-                            <div class="absolute bottom-3 left-3">
-                                <h2 class="font-bold text-lg leading-none">${p.title}</h2>
-                                <span class="text-[10px] bg-indigo-600 px-2 py-0.5 rounded mt-1 inline-block uppercase font-bold">${p.device}</span>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <p class="text-xs text-gray-400">Tap to unlock...</p>
-                        </div>
-                    </div>`).join('');
-            } else {
-                document.getElementById('app').innerHTML = '<p class="text-center text-gray-500">Not found</p>';
-            }
-        });
 
         load();
     </script>
