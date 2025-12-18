@@ -6,27 +6,30 @@
     <title>SensiBD Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
     <script type="text/javascript" src="https://pl27973568.effectivegatecpm.com/a3/7a/5b/a37a5b77fe911c2ad4f807bceac08e82.js"></script>
 
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; }
-        .glass { background: rgba(30,41,59,0.9); border: 1px solid rgba(255,255,255,0.1); }
+        .glass { background: rgba(30,41,59,0.95); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .hidden { display: none !important; }
         .page-enter { animation: slideUp 0.3s ease-out forwards; }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .hidden { display: none !important; }
-        .tab-active { background-color: #4f46e5; color: white; }
-        .tab-inactive { background-color: #1f2937; color: #9ca3af; }
+        
+        /* 🔥 HEAVY BLUR CLASS 🔥 */
+        .secret-blur { filter: blur(25px); pointer-events: none; transition: filter 0.5s ease; }
+        .secret-visible { filter: blur(0px); pointer-events: auto; }
+        
+        .tab-active { background: #4f46e5; color: white; }
+        .tab-inactive { background: #1f2937; color: #9ca3af; }
     </style>
 </head>
 <body class="min-h-screen">
     
     <div id="home-page">
         <nav class="fixed top-0 w-full z-40 glass px-4 py-3 flex justify-between shadow-xl items-center">
-            <h1 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-green-400">SENSIBD</h1>
-            <button onclick="openModal()" class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg hover:scale-110 transition"><i class="fas fa-cloud-upload-alt text-white"></i></button>
+            <h1 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">SENSIBD</h1>
+            <button onclick="document.getElementById('upModal').classList.remove('hidden')" class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg hover:scale-110 transition"><i class="fas fa-cloud-upload-alt text-white"></i></button>
         </nav>
-
         <main id="app" class="pt-24 px-4 pb-10 max-w-xl mx-auto grid grid-cols-2 gap-4">
             <div class="col-span-2 text-center mt-10"><i class="fas fa-spinner fa-spin text-indigo-500 text-2xl"></i></div>
         </main>
@@ -34,166 +37,165 @@
 
     <div id="post-page" class="fixed inset-0 z-50 bg-gray-900 overflow-y-auto hidden">
         <div class="sticky top-0 bg-gray-900/95 backdrop-blur-md p-4 flex items-center gap-4 border-b border-gray-800 z-50">
-            <button onclick="closePost()" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700"><i class="fas fa-arrow-left"></i></button>
-            <h2 id="p-nav-title" class="font-bold text-lg truncate text-gray-200">Details</h2>
+            <button onclick="closePost()" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
+            <h2 class="font-bold text-lg truncate text-gray-200">Details</h2>
         </div>
 
         <div class="p-5 max-w-xl mx-auto space-y-6">
             <img id="p-thumb" class="w-full rounded-xl shadow-2xl border border-gray-700">
-            
             <div>
-                <span id="p-device" class="bg-indigo-600 text-xs font-bold px-3 py-1 rounded-full uppercase">DEVICE</span>
-                <h1 id="p-title" class="text-2xl font-bold mt-3 leading-tight">Title Here</h1>
+                <span id="p-device" class="bg-indigo-600 text-[10px] font-bold px-2 py-1 rounded uppercase">DEVICE</span>
+                <h1 id="p-title" class="text-2xl font-bold mt-2">Title</h1>
             </div>
 
             <div class="relative bg-black rounded-xl border border-gray-700 overflow-hidden min-h-[250px]">
-                <div id="lock-overlay" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900/98 transition-opacity duration-500">
-                    <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4 border border-gray-600">
-                        <i class="fas fa-lock text-yellow-500 text-2xl animate-pulse"></i>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1 text-white">Premium Sensi</h3>
-                    <p class="text-gray-400 text-xs mb-5">Unlock to reveal secret settings</p>
-                    <button onclick="startTimer()" id="unlock-btn" class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition text-sm">Unlock Now (30s)</button>
-                    <div id="timer-display" class="hidden text-5xl font-mono font-bold text-yellow-400 animate-bounce">30</div>
+                
+                <div id="lock-overlay" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900/90 transition-opacity duration-500">
+                    <i class="fas fa-lock text-yellow-500 text-3xl mb-3 animate-pulse"></i>
+                    <h3 class="font-bold text-white">Premium Content</h3>
+                    <p class="text-gray-400 text-xs mb-5">Unlock to see secret image</p>
+                    <button onclick="startTimer()" id="unlock-btn" class="bg-indigo-600 px-8 py-2 rounded-full font-bold shadow-lg hover:scale-105 transition">Unlock (30s)</button>
+                    <div id="timer-display" class="hidden text-5xl font-mono font-bold text-yellow-400">30</div>
                 </div>
-                <img id="p-secret" class="w-full h-full object-contain">
+                
+                <img id="p-secret" class="w-full h-full object-contain secret-blur">
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-4">
-                <a id="lnk-sensi" href="#" target="_blank" class="bg-gray-800 py-4 rounded-xl text-center font-bold border border-gray-700 hover:border-indigo-500 hover:bg-gray-700 transition text-blue-400">
-                    <i class="fas fa-file-download text-xl block mb-2"></i> Sensi
-                </a>
-                <a id="lnk-panel" href="#" target="_blank" class="bg-gray-800 py-4 rounded-xl text-center font-bold border border-gray-700 hover:border-purple-500 hover:bg-gray-700 transition text-purple-400">
-                    <i class="fas fa-code text-xl block mb-2"></i> Panel
-                </a>
+                <a id="lnk-sensi" href="#" target="_blank" class="bg-gray-800 py-3 rounded-lg text-center font-bold border border-gray-700 hover:bg-gray-700 text-blue-400 text-sm">Download Sensi</a>
+                <a id="lnk-panel" href="#" target="_blank" class="bg-gray-800 py-3 rounded-lg text-center font-bold border border-gray-700 hover:bg-gray-700 text-purple-400 text-sm">Download Panel</a>
             </div>
         </div>
     </div>
 
     <div id="upModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4 hidden">
-        <div class="bg-gray-800 rounded-xl w-full max-w-sm border border-gray-700 overflow-hidden shadow-2xl">
+        <div class="bg-gray-800 rounded-xl w-full max-w-sm border border-gray-700 overflow-hidden">
             <div class="flex text-sm font-bold border-b border-gray-700">
-                <button onclick="switchTab('up')" id="tab-up" class="flex-1 py-3 tab-active">Upload</button>
-                <button onclick="switchTab('req')" id="tab-req" class="flex-1 py-3 tab-inactive">Request</button>
+                <button onclick="swTab('up')" id="t-up" class="flex-1 py-3 tab-active">Upload</button>
+                <button onclick="swTab('req')" id="t-req" class="flex-1 py-3 tab-inactive">Request</button>
             </div>
-            
             <div class="p-5">
-                <div id="form-up" class="space-y-4">
-                    <input id="u-dev" type="text" placeholder="Device Name" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 text-white outline-none">
+                <div id="f-up" class="space-y-4">
+                    <input id="u-dev" type="text" placeholder="Device Name" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 outline-none">
                     <input id="u-file" type="file" class="w-full text-xs text-gray-400">
-                    <button onclick="sendUpload()" id="btn-up-send" class="w-full bg-indigo-600 py-2.5 rounded-lg font-bold text-sm hover:bg-indigo-500">Send Upload</button>
+                    <button onclick="sendData('photo')" id="b-up" class="w-full bg-indigo-600 py-2 rounded font-bold">Send Upload</button>
                 </div>
-
-                <div id="form-req" class="space-y-4 hidden">
-                    <input id="r-dev" type="text" placeholder="Device Name" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 text-white outline-none">
-                    <textarea id="r-msg" placeholder="Details..." class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 text-white outline-none"></textarea>
-                    <button onclick="sendRequest()" id="btn-req-send" class="w-full bg-purple-600 py-2.5 rounded-lg font-bold text-sm hover:bg-purple-500">Send Request</button>
+                <div id="f-req" class="space-y-4 hidden">
+                    <input id="r-dev" type="text" placeholder="Device Name" class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 outline-none">
+                    <textarea id="r-msg" placeholder="Details..." class="w-full bg-gray-900 p-3 rounded-lg text-sm border border-gray-600 outline-none"></textarea>
+                    <button onclick="sendData('msg')" id="b-req" class="w-full bg-purple-600 py-2 rounded font-bold">Send Request</button>
                 </div>
-                <button onclick="document.getElementById('upModal').classList.add('hidden')" class="w-full mt-4 text-xs text-red-400 hover:text-white">Close</button>
+                <button onclick="document.getElementById('upModal').classList.add('hidden')" class="w-full mt-4 text-xs text-red-400">Close</button>
             </div>
         </div>
     </div>
 
     <script>
         const CFG = { 
-            // ✅ আপনার নতুন ডাটাবেস লিংক
-            binUrl: "https://api.jsonbin.io/v3/b/69440783d0ea881f40323ec1/latest",
-            bot: "8035929255:AAFtYUflLVLPdBhzDn6vVjsxIkAALhqZtA4", 
-            chat: "6963247195" 
+            bin: "https://api.jsonbin.io/v3/b/69440783d0ea881f40323ec1/latest",
+            // ⚠️ আপনার Render লিংক নিচে বসান
+            backend: "https://sensibd-1.onrender.com" 
         };
 
-        let allPosts = [];
+        let posts = [];
 
         async function load() {
             try {
-                const r = await fetch(CFG.binUrl);
+                const r = await fetch(CFG.bin);
                 const d = await r.json();
-                allPosts = d.record;
-
+                posts = d.record;
                 const app = document.getElementById('app');
-                if(!allPosts || allPosts.length === 0) {
-                    app.innerHTML = '<p class="col-span-2 text-center text-gray-500 mt-10">No configs found.</p>';
-                    return;
-                }
-
-                app.innerHTML = allPosts.map((p, index) => `
-                    <div onclick="openPost(${index})" class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 active:scale-95 transition cursor-pointer group">
-                        <div class="h-40 w-full relative overflow-hidden">
-                            <img src="${p.thumb}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent opacity-60"></div>
-                        </div>
-                        <div class="p-3">
-                            <h3 class="font-bold text-sm truncate">${p.title}</h3>
-                            <p class="text-[10px] text-gray-400 mt-1 uppercase bg-gray-900 inline-block px-2 rounded">${p.device}</p>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) { console.log(e); }
+                if(!posts.length) { app.innerHTML='<p class="col-span-2 text-center text-gray-500 mt-10">Empty.</p>'; return; }
+                app.innerHTML = posts.map((p,i) => `
+                    <div onclick="openPost(${i})" class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 active:scale-95 transition cursor-pointer group">
+                        <div class="h-40 relative overflow-hidden"><img src="${p.thumb}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500"><div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent opacity-60"></div></div>
+                        <div class="p-3"><h3 class="font-bold text-sm truncate">${p.title}</h3><span class="text-[10px] bg-gray-900 px-2 py-0.5 rounded uppercase text-gray-400">${p.device}</span></div>
+                    </div>`).join('');
+            } catch { console.log("Error"); }
         }
 
-        window.openPost = (index) => {
-            const p = allPosts[index];
-            document.getElementById('p-nav-title').innerText = p.device;
+        window.openPost = (i) => {
+            const p = posts[i];
             document.getElementById('p-title').innerText = p.title;
             document.getElementById('p-device').innerText = p.device;
             document.getElementById('p-thumb').src = p.thumb;
-            document.getElementById('p-secret').src = p.secret;
+            
+            // Secret Logic
+            const sec = document.getElementById('p-secret');
+            sec.src = p.secret;
+            sec.className = "w-full h-full object-contain secret-blur"; // Reset Blur
+            
             document.getElementById('lnk-sensi').href = p.sensi_link;
             document.getElementById('lnk-panel').href = p.panel_link;
-
+            
             document.getElementById('lock-overlay').style.display = 'flex';
-            document.getElementById('post-page').classList.remove('hidden');
-            document.getElementById('post-page').classList.add('page-enter');
+            document.getElementById('unlock-btn').style.display = 'block';
+            document.getElementById('timer-display').classList.add('hidden');
+            
+            const page = document.getElementById('post-page');
+            page.classList.remove('hidden');
+            page.classList.add('page-enter');
         }
 
         window.closePost = () => document.getElementById('post-page').classList.add('hidden');
-        window.openModal = () => document.getElementById('upModal').classList.remove('hidden');
 
         window.startTimer = () => {
-            const btn = document.getElementById('unlock-btn');
+            document.getElementById('unlock-btn').style.display='none';
             const disp = document.getElementById('timer-display');
-            btn.style.display = 'none';
             disp.classList.remove('hidden');
-            let t = 30;
-            disp.innerText = t;
-            const intv = setInterval(() => {
-                t--; disp.innerText = t;
-                if(t <= 0) { clearInterval(intv); document.getElementById('lock-overlay').style.display = 'none'; }
-            }, 1000);
+            let t=30; disp.innerText=t;
+            const iv = setInterval(()=>{
+                t--; disp.innerText=t;
+                if(t<=0) {
+                    clearInterval(iv);
+                    document.getElementById('lock-overlay').style.display='none';
+                    // 🔥 BLUR রিমুভ করা হচ্ছে 🔥
+                    document.getElementById('p-secret').className = "w-full h-full object-contain secret-visible";
+                }
+            },1000);
         }
 
-        window.switchTab = (tab) => {
-            document.getElementById('form-up').classList.toggle('hidden', tab !== 'up');
-            document.getElementById('form-req').classList.toggle('hidden', tab !== 'req');
-            document.getElementById('tab-up').className = tab === 'up' ? "flex-1 py-3 tab-active" : "flex-1 py-3 tab-inactive";
-            document.getElementById('tab-req').className = tab === 'req' ? "flex-1 py-3 tab-active" : "flex-1 py-3 tab-inactive";
+        window.swTab = (t) => {
+            document.getElementById('f-up').classList.toggle('hidden', t!=='up');
+            document.getElementById('f-req').classList.toggle('hidden', t!=='req');
+            document.getElementById('t-up').className = t==='up'?"flex-1 py-3 tab-active":"flex-1 py-3 tab-inactive";
+            document.getElementById('t-req').className = t==='req'?"flex-1 py-3 tab-active":"flex-1 py-3 tab-inactive";
         }
 
-        async function sendUpload() {
-            const dev = document.getElementById('u-dev').value;
-            const file = document.getElementById('u-file').files[0];
-            const btn = document.getElementById('btn-up-send');
-            if(!dev || !file) return alert("❌ নাম এবং ফাইল দিন!");
-            
+        async function sendData(type) {
+            const btn = document.getElementById(type==='photo'?'b-up':'b-req');
             btn.innerText = "Sending...";
-            const fd = new FormData(); fd.append("chat_id", CFG.chat); fd.append("photo", file); fd.append("caption", `📤 Upload: ${dev}`);
-            try { await fetch(`https://api.telegram.org/bot${CFG.bot}/sendPhoto`, {method:'POST', body:fd}); alert("✅ Sent!"); document.getElementById('upModal').classList.add('hidden'); }
-            catch { alert("❌ Error!"); }
-            btn.innerText = "Send Upload";
-        }
-
-        async function sendRequest() {
-            const dev = document.getElementById('r-dev').value;
-            const msg = document.getElementById('r-msg').value;
-            const btn = document.getElementById('btn-req-send');
-            if(!dev) return alert("❌ নাম দিন!");
             
-            btn.innerText = "Sending...";
-            try { await fetch(`https://api.telegram.org/bot${CFG.bot}/sendMessage`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chat_id: CFG.chat, text:`📥 Request: ${dev}\n💬 ${msg}`})}); alert("✅ Sent!"); document.getElementById('upModal').classList.add('hidden'); }
-            catch { alert("❌ Error!"); }
-            btn.innerText = "Send Request";
+            try {
+                let url, body;
+                if(type === 'photo') {
+                    const dev = document.getElementById('u-dev').value;
+                    const f = document.getElementById('u-file').files[0];
+                    if(!dev || !f) throw new Error();
+                    const fd = new FormData();
+                    fd.append('caption', `📤 Upload: ${dev}`);
+                    fd.append('photo', f);
+                    url = `${CFG.backend}/tele-photo`;
+                    body = fd;
+                } else {
+                    const dev = document.getElementById('r-dev').value;
+                    const msg = document.getElementById('r-msg').value;
+                    if(!dev) throw new Error();
+                    url = `${CFG.backend}/tele-msg`;
+                    body = JSON.stringify({text:`📥 Request: ${dev}\n💬 ${msg}`});
+                }
+                
+                const res = await fetch(url, {
+                    method:'POST',
+                    headers: type==='msg'?{'Content-Type':'application/json'}:{},
+                    body: body
+                });
+                
+                if(res.ok) { alert("✅ Sent!"); document.getElementById('upModal').classList.add('hidden'); }
+                else throw new Error();
+            } catch { alert("❌ Failed! Check Internet."); }
+            btn.innerText = "Send";
         }
-
         load();
     </script>
 </body>
