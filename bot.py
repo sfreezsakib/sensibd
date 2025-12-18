@@ -8,7 +8,7 @@ from github import Github
 
 # ============ CREDENTIALS (আপনার তথ্য বসানো হয়েছে) ============
 TELEGRAM_TOKEN = "8429248919:AAF403QR9g7FPxNDeLdiIIBBROu25Fbfit8"
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = "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"
 REPO_NAME = "sfreezsakib/sensibd"
 # =============================================================
 
