@@ -9,6 +9,7 @@
     
     <script type="text/javascript" src="https://pl27973568.effectivegatecpm.com/a3/7a/5b/a37a5b77fe911c2ad4f807bceac08e82.js"></script>
     <script type="text/javascript" src="https://pl27973575.effectivegatecpm.com/85/91/3c/85913c8d9ebf0d128a8114e95032ce40.js"></script>
+
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; }
         .glass { background: rgba(30,41,59,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
@@ -92,9 +93,8 @@
     <script>
         // ============ CONFIGURATION ============
         const CFG = { 
-            user: "sfreezsakib", 
-            repo: "sensibd", 
-            // এই বটটি ইউজারদের মেসেজ আপনার কাছে পাঠাবে
+            // ✅ আপনার JSONBin লিংক বসানো হয়েছে
+            binUrl: "https://api.jsonbin.io/v3/b/69440783d0ea881f40323ec1/latest",
             bot: "8035929255:AAFtYUflLVLPdBhzDn6vVjsxIkAALhqZtA4", 
             chat: "6963247195" 
         };
@@ -104,16 +104,17 @@
 
         async function load() {
             try {
-                // Cache bypassing added
-                const r = await fetch(`https://raw.githubusercontent.com/${CFG.user}/${CFG.repo}/main/data.json?t=`+Date.now());
+                // ✅ JSONBin থেকে ডাটা লোড হবে
+                const r = await fetch(CFG.binUrl);
                 const d = await r.json();
-                
-                if(d.length === 0) {
+                const posts = d.record; // JSONBin ডাটা 'record' এর ভেতর রাখে
+
+                if(!posts || posts.length === 0) {
                     document.getElementById('app').innerHTML = '<p class="text-center text-gray-500">No posts yet.</p>';
                     return;
                 }
 
-                document.getElementById('app').innerHTML = d.map(p => `
+                document.getElementById('app').innerHTML = posts.map(p => `
                     <div class="glass rounded-xl overflow-hidden shadow-xl animate-fade-in group">
                         <div class="relative h-52">
                             <img src="${p.thumb}" class="w-full h-full object-cover">
@@ -138,7 +139,7 @@
                             </div>
                         </div>
                     </div>`).join('');
-            } catch { document.getElementById('app').innerHTML = '<p class="text-center text-red-400">Server Error</p>'; }
+            } catch (e) { document.getElementById('app').innerHTML = '<p class="text-center text-red-400">Server Error</p>'; }
         }
 
         window.timer = (id) => {
@@ -221,12 +222,29 @@
 
         document.getElementById('search').addEventListener('input', async (e) => {
             const v = e.target.value.toLowerCase();
-            const r = await fetch(`https://raw.githubusercontent.com/${CFG.user}/${CFG.repo}/main/data.json`);
+            if(v === "") return load();
+            const r = await fetch(CFG.binUrl);
             const d = await r.json();
-            const f = d.filter(x => x.device.toLowerCase().includes(v));
-            if(f.length) document.getElementById('app').innerHTML = f.map(p => `...`).join(''); // Simplified re-render logic, typically you'd call a render function
-            else document.getElementById('app').innerHTML = '<p class="text-center text-gray-500">Not found</p>';
-            if(v === "") load(); // Reload original if empty
+            const f = d.record.filter(x => x.device.toLowerCase().includes(v));
+            // Simple render for search
+            if(f.length) {
+                document.getElementById('app').innerHTML = f.map(p => `
+                    <div class="glass rounded-xl overflow-hidden shadow-xl animate-fade-in group">
+                        <div class="relative h-52">
+                            <img src="${p.thumb}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent"></div>
+                            <div class="absolute bottom-3 left-3">
+                                <h2 class="font-bold text-lg leading-none">${p.title}</h2>
+                                <span class="text-[10px] bg-indigo-600 px-2 py-0.5 rounded mt-1 inline-block uppercase font-bold">${p.device}</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-xs text-gray-400">Tap to unlock...</p>
+                        </div>
+                    </div>`).join('');
+            } else {
+                document.getElementById('app').innerHTML = '<p class="text-center text-gray-500">Not found</p>';
+            }
         });
 
         load();
