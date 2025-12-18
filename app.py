@@ -1,50 +1,36 @@
-import os
-import json
-import base64
 import time
+import requests
 from flask import Flask, request, render_template_string, redirect, url_for, flash
-from github import Github
 
 # ================= কনফিগারেশন =================
-GITHUB_TOKEN = "Ghp_zT7kPcLPdsHwVuoP2NQAPW1p78Bg5v1ihD9N"
-REPO_NAME = "sfreezsakib/sensibd"
-ADMIN_PASSWORD = "admin123"  # লগইন পাসওয়ার্ড
+# আপনার দেওয়া তথ্য বসানো হয়েছে
+BIN_ID = "69440783d0ea881f40323ec1"
+API_KEY = "$2a$10$dkF5fQAD6/PGd.OmI3W7F.RRypzqocuS1/MAmdeUzfUyOG1HekoGy"
+
+ADMIN_PASSWORD = "admin123"  # পাসওয়ার্ড
 # ============================================
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'
 
-# --- GITHUB কানেকশন ---
-def get_repo():
-    try:
-        g = Github(GITHUB_TOKEN)
-        return g.get_repo(REPO_NAME)
-    except: return None
-
+# --- JSONBIN কানেকশন ---
 def get_data():
-    repo = get_repo()
-    if not repo: return []
+    url = f"https://api.jsonbin.io/v3/b/{BIN_ID}/latest"
+    headers = {"X-Master-Key": API_KEY}
     try:
-        content = repo.get_contents("data.json")
-        return json.loads(base64.b64decode(content.content).decode('utf-8'))
+        resp = requests.get(url, headers=headers)
+        return resp.json().get("record", [])
     except: return []
 
-def push_file(file_storage):
-    repo = get_repo()
-    if not repo: return None
+def update_data(new_data):
+    url = f"https://api.jsonbin.io/v3/b/{BIN_ID}"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Master-Key": API_KEY
+    }
     try:
-        filename = f"images/{int(time.time())}_{file_storage.filename}"
-        repo.create_file(filename, f"Upload {filename}", file_storage.read())
-        return f"https://raw.githubusercontent.com/{REPO_NAME.split('/')[0]}/{REPO_NAME.split('/')[1]}/main/{filename}"
-    except: return None
-
-def update_json(new_data):
-    repo = get_repo()
-    if not repo: return False
-    try:
-        c = repo.get_contents("data.json")
-        repo.update_file(c.path, "Update", json.dumps(new_data, indent=2), c.sha)
-        return True
+        req = requests.put(url, json=new_data, headers=headers)
+        return req.status_code == 200
     except: return False
 
 # --- HTML টেমপ্লেট ---
@@ -54,64 +40,58 @@ HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Sensi Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-slate-900 text-white min-h-screen p-4">
-    <div class="max-w-3xl mx-auto">
-        <div class="flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg shadow-lg">
-            <h1 class="text-xl font-bold text-indigo-400">🔥 SensiBD Admin</h1>
+<body class="bg-gray-900 text-white min-h-screen p-4">
+    <div class="max-w-2xl mx-auto">
+        <div class="flex justify-between items-center mb-6 bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700">
+            <h1 class="text-xl font-bold text-green-400">⚡ Admin Panel</h1>
             <a href="/logout" class="text-red-400 font-bold text-sm">Logout</a>
         </div>
         
         {% with msgs = get_flashed_messages(with_categories=true) %}
           {% if msgs %}
             {% for cat, msg in msgs %}
-              <div class="p-3 mb-4 rounded {{ 'bg-green-600' if cat == 'success' else 'bg-red-600' }}">{{ msg }}</div>
+              <div class="p-3 mb-4 rounded text-center font-bold {{ 'bg-green-600' if cat == 'success' else 'bg-red-600' }}">{{ msg }}</div>
             {% endfor %}
           {% endif %}
         {% endwith %}
 
-        <div class="bg-slate-800 p-6 rounded-lg shadow-lg mb-8 border border-slate-700">
-            <h2 class="font-bold mb-4 text-lg">New Post</h2>
-            <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-3">
-                <input type="text" name="device" placeholder="Device Name (e.g. Redmi 10)" required class="w-full bg-slate-900 p-2 rounded border border-slate-600">
-                <input type="text" name="title" placeholder="Post Title" required class="w-full bg-slate-900 p-2 rounded border border-slate-600">
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 border border-gray-700">
+            <h2 class="font-bold mb-4 text-lg text-indigo-300">New Post</h2>
+            <form action="/upload" method="post" class="space-y-4">
+                <input type="text" name="device" placeholder="Device Name" required class="w-full bg-gray-900 p-3 rounded border border-gray-600 outline-none">
+                <input type="text" name="title" placeholder="Title" required class="w-full bg-gray-900 p-3 rounded border border-gray-600 outline-none">
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs text-gray-400">Thumbnail</label>
-                        <input type="file" name="thumb" required class="w-full text-xs">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400">Secret Image</label>
-                        <input type="file" name="secret" required class="w-full text-xs">
-                    </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <input type="text" name="thumb" placeholder="Thumbnail Link (Direct Link)" required class="w-full bg-gray-900 p-3 rounded border border-gray-600 text-sm">
+                    <input type="text" name="secret" placeholder="Secret Image Link (Direct Link)" required class="w-full bg-gray-900 p-3 rounded border border-gray-600 text-sm">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="text" name="sensi" placeholder="Sensi Link (# if none)" class="bg-slate-900 p-2 rounded border border-slate-600">
-                    <input type="text" name="panel" placeholder="Panel Link (# if none)" class="bg-slate-900 p-2 rounded border border-slate-600">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <input type="text" name="sensi" placeholder="Sensi Link (#)" class="bg-gray-900 p-3 rounded border border-gray-600 text-sm">
+                    <input type="text" name="panel" placeholder="Panel Link (#)" class="bg-gray-900 p-3 rounded border border-gray-600 text-sm">
                 </div>
 
-                <button class="w-full bg-indigo-600 py-2 rounded font-bold hover:bg-indigo-500">Publish Now</button>
+                <button class="w-full bg-green-600 py-3 rounded font-bold hover:bg-green-500 transition">🚀 Publish Post</button>
             </form>
         </div>
 
         <div class="space-y-4">
-            <h2 class="font-bold text-lg">Recent Posts</h2>
+            <h2 class="font-bold text-lg">Live Posts</h2>
             {% for post in posts %}
-            <div class="bg-slate-800 p-3 rounded flex justify-between items-center border border-slate-700">
-                <div class="flex items-center gap-3">
-                    <img src="{{ post.thumb }}" class="w-12 h-12 object-cover rounded">
+            <div class="bg-gray-800 p-4 rounded-xl flex justify-between items-center border border-gray-700">
+                <div class="flex items-center gap-4">
+                    <img src="{{ post.thumb }}" class="w-16 h-16 object-cover rounded bg-gray-900" onerror="this.src='https://placehold.co/100x100?text=Error'">
                     <div>
                         <h3 class="font-bold text-sm">{{ post.title }}</h3>
                         <p class="text-xs text-gray-400">{{ post.device }}</p>
                     </div>
                 </div>
                 <form action="/delete/{{ post.id }}" method="post" onsubmit="return confirm('Delete?');">
-                    <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                    <button class="bg-red-500/20 text-red-500 p-2 rounded hover:bg-red-500 hover:text-white"><i class="fas fa-trash"></i></button>
                 </form>
             </div>
             {% endfor %}
@@ -122,16 +102,16 @@ HTML = """
 """
 
 LOGIN_HTML = """
-<body style="background:#0f172a; display:flex; justify-content:center; align-items:center; height:100vh; color:white; font-family:sans-serif;">
-    <form method="post" style="text-align:center; padding:20px; background:#1e293b; border-radius:10px;">
-        <h3>🔒 Admin Login</h3>
-        <input type="password" name="password" placeholder="Password" style="padding:5px; border-radius:5px; border:none;">
-        <button style="padding:5px 10px; background:#4f46e5; color:white; border:none; border-radius:5px; cursor:pointer;">Login</button>
+<body style="background:#111827; display:flex; justify-content:center; align-items:center; height:100vh; color:white; font-family:sans-serif;">
+    <form method="post" style="text-align:center; padding:2rem; background:#1f2937; border-radius:1rem; border:1px solid #374151;">
+        <h3 style="margin-bottom:1.5rem; color:#4ade80;">Login</h3>
+        <input type="password" name="password" placeholder="Password" style="padding:10px; border-radius:5px; border:none; background:#111827; color:white; outline:none;">
+        <br><br>
+        <button style="padding:10px 20px; background:#16a34a; color:white; border:none; border-radius:5px; font-weight:bold;">Enter</button>
     </form>
 </body>
 """
 
-# --- ROUTES ---
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -146,37 +126,28 @@ def admin():
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
-        dev = request.form.get('device')
-        tit = request.form.get('title')
-        thu = request.files.get('thumb')
-        sec = request.files.get('secret')
-        sen = request.form.get('sensi') or "#"
-        pan = request.form.get('panel') or "#"
-
-        t_url = push_file(thu)
-        s_url = push_file(sec)
-
-        if not t_url or not s_url:
-            flash("❌ Image Upload Failed!", "error")
-            return redirect(url_for('admin'))
-
-        data = get_data()
-        data.insert(0, {
+        new_post = {
             "id": int(time.time()),
-            "device": dev, "title": tit,
-            "thumb": t_url, "secret": s_url,
-            "sensi_link": sen, "panel_link": pan
-        })
+            "device": request.form.get('device'),
+            "title": request.form.get('title'),
+            "thumb": request.form.get('thumb'),
+            "secret": request.form.get('secret'),
+            "sensi_link": request.form.get('sensi') or "#",
+            "panel_link": request.form.get('panel') or "#"
+        }
+        data = get_data()
+        data.insert(0, new_post)
         
-        if update_json(data): flash("✅ Published!", "success")
-        else: flash("❌ Database Error!", "error")
+        if update_data(data): flash("✅ Published!", "success")
+        else: flash("❌ Error saving to JSONBin", "error")
     except Exception as e: flash(f"Error: {e}", "error")
     return redirect(url_for('admin'))
 
 @app.route('/delete/<int:pid>', methods=['POST'])
 def delete(pid):
     data = [p for p in get_data() if p['id'] != pid]
-    if update_json(data): flash("🗑️ Deleted!", "success")
+    if update_data(data): flash("🗑️ Deleted!", "success")
+    else: flash("❌ Delete Failed", "error")
     return redirect(url_for('admin'))
 
 @app.route('/logout')
